@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css" />
+  
+
+    <title>Cronômetro</title>
+  </head>
+  <body>
+    <div id="stopwatch">
+      <h2 id="timer">00:00:00:000</h2>
+      <div id="actions">
+        <button id="reset">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+
+        <button id="power" data-action="start">
+          <i class="fa-solid fa-circle-play"></i>
+        </button>
+        <button id="mark">
+          <i class="fa-solid fa-flag"></i>
+        </button>
+      </div>
+    </div>
+    <div id="marks-list"></div>
+    <script>
+      const timerEl = document.getElementById('timer');
+const marksList = document.getElementById('marks-list');
+let intervalId = 0;
+let timer = 0;
+let marks = [];
+
+const formatTime = (time) => {
+    const hours = Math.floor(time / 360000);
+    const minutes = Math.floor((time % 360000) / 6000);
+    const seconds = Math.floor((time % 6000) / 100);
+    const hundredths = time % 100;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${hundredths.toString().padStart(2, '0')}`;
+}
+
+const setTimer = (time) => {
+    timerEl.innerText = formatTime(time);
+}
+
+const addMarkToList = (markIndex, markTime) => {
+    marksList.innerHTML += `<p>Marca ${markIndex}: ${formatTime(markTime)}</p>`;
+}
+
+const toggleTimer = () => {
+    const button = document.getElementById('power');
+    const action = button.getAttribute('action');
+
+    clearInterval(intervalId);
+
+    if (action == 'start' || action == 'continue') {
+        intervalId = setInterval(() => {
+            timer += 1;
+            setTimer(timer);
+    }, 10);
+        button.setAttribute('action', 'pause');
+        button.innerHTML = '<i class="fa-solid fa-pause"></i>';
+    } else if (action == 'pause') {
+        button.setAttribute('action', 'continue');
+        button.innerHTML = '<i class="fa-solid fa-play"></i>';
+    }
+}
+
+const markTime = () => {
+    marks.push(timer);
+    addMarkToList(marks.length, timer);
+}
+
+const resetTimer = () => {
+    clearInterval(intervalId);
+    timer = 0;
+    marks = [];
+    setTimer(timer);
+    marksList.innerHTML = '';
+    const button = document.getElementById('power');
+    button.setAttribute('action', 'start');
+    button.innerHTML = '<i class="fa-solid fa-play"></i>';
+}
+
+document.getElementById('power').addEventListener('click', toggleTimer);
+document.getElementById('mark').addEventListener('click', markTime);
+document.getElementById('reset').addEventListener('click', resetTimer);
+    </script>
+  </body>
+ 
+</html>
